@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Hacking Team | Member Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a, #0d0d0d);
+            min-height: 100vh;
+            color: #00ff41;
+        }
+
+        /* Matrix Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00ff41;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+        }
+
+        .glitch {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 2px 2px 0 #008f11;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+            margin: 10px 0 30px 0;
+            border-bottom: 1px solid #333;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 8px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #00ff41;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Questions Section */
+        .questions-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .question-item {
+            background: rgba(0, 30, 0, 0.3);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #00ff41;
+        }
+
+        .question-text {
+            color: #00ff41;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-item input, .question-item textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #00ff41;
+        }
+
+        /* CAPTCHA Styles */
+        .captcha-section {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .captcha-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .captcha-code {
+            background: #0a0a0a;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 8px;
+            padding: 10px 20px;
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            font-family: monospace;
+            text-shadow: 0 0 5px #00ff41;
+            user-select: none;
+        }
+
+        .captcha-input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .captcha-input input {
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .refresh-captcha {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .refresh-captcha:hover {
+            background: #00ff41;
+            color: #000;
+        }
+
+        .captcha-error {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 15px #00ff41;
+        }
+
+        /* Popup */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            padding: 25px 35px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+        }
+
+        .popup h3 {
+            color: #ff0000;
+            margin-bottom: 15px;
+        }
+
+        .popup button {
+            background: #ff0000;
+            border: none;
+            padding: 8px 25px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 999;
+            display: none;
+        }
+
+        /* Hide/Show */
+        .hide {
+            display: none;
+        }
+
+        /* Success Info */
+        .success-info {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 10px;
+        }
+
+        .success-info p {
+            margin: 10px 0;
+            color: #0f0;
+        }
+
+        .team-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            font-size: 0.7rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas class="matrix-bg" id="matrix"></canvas>
+
+    <div class="container">
+        
+        <!-- Login Card -->
+        <div class="card" id="loginCard">
+            <div class="glitch">┌∩┐(◣_◢)┌∩┐</div>
+            <div class="glitch" style="font-size: 1.3rem;">ERROR HACKING TEAM</div>
+            <div class="subtitle">>> AUTHENTICATION REQUIRED <<</div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>⚡ USERNAME</label>
+                    <input type="text" id="username" placeholder="Enter your ID" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>🔐 PASSWORD</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn">>> ACCESS SYSTEM <<</button>
+            </form>
+
+            <div class="team-footer">
+                <p>━━━━━━━━━━━━━━━━━━━━━</p>
+                <p>👑 Founder: Raj Gautam | 🆔 Team Error ID: EHT-47-09-2024</p>
+                <p>━━━━━━━━━━━━━━━━━━━━━</p>
+            </div>
+        </div>
+
+        <!-- Member Registration Form -->
+        <div class="card hide" id="registrationCard">
+            <div class="glitch">📝 MEMBER REGISTRATION</div>
+            <div class="subtitle">>> FILL YOUR DETAILS TO JOIN <<</div>
+
+            <form id="registrationForm">
+                <!-- Personal Information -->
+                <div class="form-group">
+                    <label>👤 FULL NAME</label>
+                    <input type="text" id="fullname" required placeholder="Enter your real name">
+                </div>
+
+                <div class="form-group">
+                    <label>📧 EMAIL ADDRESS</label>
+                    <input type="email" id="email" required placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label>📱 CONTACT NUMBER</label>
+                    <input type="tel" id="phone" required placeholder="+91 XXXXX XXXXX">
+                </div>
+
+                <div class="form-group">
+                    <label>📍 LOCATION (City/Country)</label>
+                    <input type="text" id="location" required placeholder="e.g., Delhi, India">
+                </div>
+
+                <div class="form-group">
+                    <label>💻 TECHNICAL SKILLS (Select all that apply)</label>
+                    <select id="skills" multiple size="4" style="height: auto;">
+                        <option value="Web Hacking">🌐 Web Hacking</option>
+                        <option value="WiFi Security">📡 WiFi Security</option>
+                        <option value="Reverse Engineering">🔧 Reverse Engineering</option>
+                        <option value="Python Scripting">🐍 Python Scripting</option>
+                        <option value="Linux Systems">🐧 Linux Systems</option>
+                        <option value="Forensics">🔍 Forensics</option>
+                        <option value="Malware Analysis">🦠 Malware Analysis</option>
+                        <option value="Social Engineering">🎭 Social Engineering</option>
+                    </select>
+                    <small style="color: #666;">Hold Ctrl to select multiple</small>
+                </div>
+
+                <div class="form-group">
+                    <label>📚 KNOWLEDGE LEVEL</label>
+                    <select id="knowledge" required>
+                        <option value="">-- Select --</option>
+                        <option value="Beginner">🌱 Beginner (Learning basics)</option>
+                        <option value="Intermediate">⚡ Intermediate (Practical knowledge)</option>
+                        <option value="Advanced">🔥 Advanced (Bug hunting/CTF player)</option>
+                        <option value="Expert">💀 Expert (Professional/Researcher)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🏆 WHY DO YOU WANT TO JOIN ERROR HACKING TEAM?</label>
+                    <textarea id="reason" placeholder="Tell us about yourself and your motivation..." required></textarea>
+                </div>
+
+                <!-- 10 Knowledge Questions -->
+                <div class="questions-section">
+                    <div class="glitch" style="font-size: 1rem; text-align: left;">🔐 SECURITY KNOWLEDGE TEST</div>
+                    <div class="subtitle" style="margin: 5px 0 20px 0;">>> ANSWER THESE QUESTIONS HONESTLY <<</div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q1. What does SQL Injection allow an attacker to do?</div>
+                        <input type="text" id="q1" placeholder="Your answer..." required>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q2. What is the difference between phishing and spear-phishing?</div>
+                        <textarea id="q2" rows="2" placeholder="Your answer..." required></textarea>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q3. What port does SSH run on by default?</div>
+                        <input type="text" id="q3" placeholder="Your answer..." required>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q4. What is a DDoS attack and how does it work?</div>
+                        <textarea id="q4" rows="2" placeholder="Your answer..." required></textarea>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q5. Name any three tools used for network scanning.</div>
+                        <input type="text" id="q5" placeholder="Your answer..." required>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q6. What is the purpose of Wireshark?</div>
+                        <textarea id="q6" rows="2" placeholder="Your answer..." required></textarea>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q7. What does the 'sudo' command do in Linux?</div>
+                        <input type="text" id="q7" placeholder="Your answer..." required>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q8. What is a zero-day vulnerability?</div>
+                        <textarea id="q8" rows="2" placeholder="Your answer..." required></textarea>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q9. Name any two password cracking tools.</div>
+                        <input type="text" id="q9" placeholder="Your answer..." required>
+                    </div>
+
+                    <div class="question-item">
+                        <div class="question-text">Q10. What is the difference between ethical hacking and malicious hacking?</div>
+                        <textarea id="q10" rows="2" placeholder="Your answer..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- CAPTCHA Section -->
+                <div class="captcha-section">
+                    <div style="text-align: center; margin-bottom: 15px;">🔒 VERIFY YOU ARE HUMAN 🔒</div>
+                    <div class="captcha-box">
+                        <div class="captcha-code" id="captchaCode">X8F2G</div>
+                        <div class="captcha-input">
+                            <input type="text" id="captchaInput" placeholder="Enter the code above" required>
+                        </div>
+                        <button type="button" class="refresh-captcha" id="refreshCaptcha">⟳</button>
+                    </div>
+                    <div class="captcha-error" id="captchaError">❌ Invalid CAPTCHA! Please try again.</div>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">>> SUBMIT APPLICATION <<</button>
+            </form>
+        </div>
+
+        <!-- Welcome / Success Card -->
+        <div class="card hide" id="welcomeCard">
+            <div class="glitch">✓ REGISTRATION SUCCESSFUL ✓</div>
+            <div class="glitch" style="font-size: 1rem; margin-top: 10px;">WELCOME TO ERROR HACKING TEAM</div>
+
+            <div class="success-info" id="welcomeDetails">
+                <!-- Dynamic content will be filled here -->
+            </div>
+
+            <div class="success-info" style="background: rgba(255,0,0,0.1);">
+                <p>📌 <strong>Next Steps:</strong></p>
+                <p>• Our team will review your application within 48 hours</p>
+                <p>• You will receive a verification email shortly</p>
+                <p>• Join our private Discord server after verification</p>
+                <p>• Complete the orientation to get full member access</p>
+            </div>
+
+            <button class="btn" id="homeBtn" style="margin-top: 10px;">>> BACK TO LOGIN <<</button>
+
+            <div class="team-footer" style="margin-top: 20px;">
+                <p>━━━━━━━━━━━━━━━━━━━━━</p>
+                <p>💀 "For Hackers, By Hackers" 💀</p>
+                <p>👑 Author: Raj Gautam | 🆔 Team Error ID: EHT-47-09-2024</p>
+                <p>━━━━━━━━━━━━━━━━━━━━━</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup for Wrong Login -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <h3>⛔ ACCESS DENIED ⛔</h3>
+        <p>Sorry! This system is for Hackers only.<br>Go Away 👋</p>
+        <button onclick="closePopup()">>> EXIT <<</button>
+    </div>
+
+    <script>
+        // ============ MATRIX EFFECT ============
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+        const charArray = chars.split('');
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for(let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // ============ CAPTCHA FUNCTIONS ============
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let captcha = '';
+            for(let i = 0; i < 5; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captchaCode').innerText = captcha;
+            return captcha;
+        }
+
+        let currentCaptcha = generateCaptcha();
+
+        document.getElementById('refreshCaptcha').addEventListener('click', function() {
+            currentCaptcha = generateCaptcha();
+            document.getElementById('captchaInput').value = '';
+            document.getElementById('captchaError').style.display = 'none';
+        });
+
+        function verifyCaptcha() {
+            const userInput = document.getElementById('captchaInput').value.trim().toUpperCase();
+            if(userInput === currentCaptcha) {
+                document.getElementById('captchaError').style.display = 'none';
+                return true;
+            } else {
+                document.getElementById('captchaError').style.display = 'block';
+                currentCaptcha = generateCaptcha();
+                document.getElementById('captchaInput').value = '';
+                return false;
+            }
+        }
+
+        // ============ LOGIN LOGIC ============
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(username === 'raj' && password === 'raj@123') {
+                document.getElementById('loginCard').classList.add('hide');
+                document.getElementById('registrationCard').classList.remove('hide');
+                // Reset CAPTCHA when form opens
+                currentCaptcha = generateCaptcha();
+                document.getElementById('captchaInput').value = '';
+                document.getElementById('captchaError').style.display = 'none';
+            } else {
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('popup').style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        });
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        document.getElementById('overlay').addEventListener('click', closePopup);
+
+        // ============ REGISTRATION FORM SUBMIT ============
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Verify CAPTCHA first
+            if(!verifyCaptcha()) {
+                return;
+            }
+
+            // Collect form data
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            
+            // Get selected skills
+            const skillsSelect = document.getElementById('skills');
+            const selectedSkills = Array.from(skillsSelect.selectedOptions).map(opt => opt.value);
+            
+            const knowledge = document.getElementById('knowledge').value;
+            const reason = document.getElementById('reason').value;
+
+            // Generate a random Member ID
+            const memberId = 'EHT-' + Math.floor(Math.random() * 9000 + 1000) + '-' + new Date().getFullYear();
+
+            // Display welcome message
+            const welcomeDiv = document.getElementById('welcomeDetails');
+            welcomeDiv.innerHTML = `
+                <p>✅ <strong>Member ID:</strong> ${memberId}</p>
+                <p>👤 <strong>Name:</strong> ${fullname}</p>
+                <p>📧 <strong>Email:</strong> ${email}</p>
+                <p>📍 <strong>Location:</strong> ${location}</p>
+                <p>💻 <strong>Skills:</strong> ${selectedSkills.join(', ') || 'Not specified'}</p>
+                <p>📚 <strong>Level:</strong> ${knowledge}</p>
+                <p>🕐 <strong>Application Date:</strong> ${new Date().toLocaleString()}</p>
+                <p>👑 <strong>Authorized By:</strong> Raj Gautam</p>
+            `;
+
+            // Switch to welcome card
+            document.getElementById('registrationCard').classList.add('hide');
+            document.getElementById('welcomeCard').classList.remove('hide');
+        });
+
+        // ============ HOME BUTTON (BACK TO LOGIN) ============
+        document.getElementById('homeBtn').addEventListener('click', function() {
+            document.getElementById('welcomeCard').classList.add('hide');
+            document.getElementById('loginCard').classList.remove('hide');
+            
+            // Clear forms
+            document.getElementById('registrationForm').reset();
+            document.getElementById('loginForm').reset();
+            
+            // Reset CAPTCHA
+            currentCaptcha = generateCaptcha();
+            document.getElementById('captchaInput').value = '';
+            document.getElementById('captchaError').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
